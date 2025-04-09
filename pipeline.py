@@ -37,7 +37,7 @@ param_range_C = [0.1, 1, 10, 100]
 param_range_G = [1e-4, 1e-3, 1e-2, 0.1]
 param_range_D = [2, 3, 4]  
 param_grid = {
-    'linear': { 'svc__C': param_range_C },
+    "linear": { 'svc__C': param_range_C },
     'rbf': { 'svc__C': param_range_C, 'svc__gamma': param_range_G },
     'poly': { 'svc__C': param_range_C, 'svc__gamma': param_range_G, 'svc__degree': param_range_D }
 }
@@ -45,7 +45,7 @@ param_grid = {
 # Test loop params
 results = {}
 PCA_dimensions = [50, 100, 200]
-kernels = ['poly']
+kernels = ["linear", "rbf", 'poly']
 
 # Perform Gridsearch for each PCA dimension and kernel
 for d in PCA_dimensions:
