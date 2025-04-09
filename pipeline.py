@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import idx2numpy as i2n
 from sklearn.svm import SVC
+from sklearn.utils import shuffle
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import make_pipeline
@@ -14,37 +15,32 @@ training_labels = i2n.convert_from_file('data/train-labels-idx1-ubyte/train-labe
 test_images = i2n.convert_from_file('data/t10k-images-idx3-ubyte/t10k-images.idx3-ubyte')
 test_labels = i2n.convert_from_file('data/t10k-labels-idx1-ubyte/t10k-labels.idx1-ubyte')
 
-print("Training Images Shape:", training_images.shape)
-print("Training Labels Shape:", training_labels.shape)
-print("Test Images Shape:", test_images.shape)
-print("Test Labels Shape:", test_labels.shape)
-
 # (2) Flatten images 
 training_images = training_images.reshape(training_images.shape[0], -1)
 test_images = test_images.reshape(test_images.shape[0], -1)
 
-# Print the new shapes of images after flattening
-print("Flattened Training Images Shape:", training_images.shape)
-print("Flattened Test Images Shape:", test_images.shape)
+# Shuffle the dataset before subsampling
+training_images, training_labels = shuffle(training_images, training_labels, random_state=42)
+test_images, test_labels = shuffle(test_images, test_labels, random_state=42)
+
+# Then take a smaller, random subset
+subset_size = 210  
+X_train = training_images[:subset_size]
+y_train = training_labels[:subset_size]
+X_test = test_images[:subset_size]
+y_test = test_labels[:subset_size]
 
 # (3) Create ML Pipeline
-# Define search space 
-param_range_C = [0.01, 0.1, 1, 10, 100, 500, 1000, 5000]
-param_range_G = [1e-5, 1e-4, 1e-3, 1e-2, 0.1, 1, 10, 100]
-param_range_D = [2, 3, 4, 5, 6, 7, 8, 9]
+
+# Define search space (num of paramters had to be reduced to avoid long computation time)
+param_range_C = [0.1, 1, 10, 100]
+param_range_G = [1e-4, 1e-3, 1e-2, 0.1]
+param_range_D = [2, 3, 4]  
 param_grid = {
     'linear': { 'svc__C': param_range_C },
     'rbf': { 'svc__C': param_range_C, 'svc__gamma': param_range_G },
     'poly': { 'svc__C': param_range_C, 'svc__gamma': param_range_G, 'svc__degree': param_range_D }
 }
-
-# reduce the size of the dataset for faster computation
-X_train = training_images[:210]
-y_train = training_labels[:210]
-X_test = test_images[:210]  
-y_test = test_labels[:210]
-
-
 
 # Test loop params
 results = {}
