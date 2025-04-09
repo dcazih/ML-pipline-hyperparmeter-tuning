@@ -24,7 +24,7 @@ training_images, training_labels = shuffle(training_images, training_labels, ran
 test_images, test_labels = shuffle(test_images, test_labels, random_state=42)
 
 # Then take a smaller, random subset
-subset_size = 210  
+subset_size = 6000  
 X_train = training_images[:subset_size]
 y_train = training_labels[:subset_size]
 X_test = test_images[:subset_size]
@@ -55,7 +55,7 @@ for d in PCA_dimensions:
         pipe = make_pipeline(StandardScaler(), PCA(n_components=d), SVC(kernel=k))
 
         # Fit the pipeline to the training data using gridsearch to find best hyperparameters
-        gs = GridSearchCV(pipe, param_grid[k], refit=True, cv=5, n_jobs=-1, verbose=2)
+        gs = GridSearchCV(pipe, param_grid[k], refit=True, cv=5, n_jobs=-1)
         gs.fit(X_train, y_train)
 
         # Print the best hyperparameters and accuracy given the PCA dimension and kernel
