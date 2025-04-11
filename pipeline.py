@@ -7,13 +7,16 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import make_pipeline
 from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, confusion_matrix
+
+import os
+print(os.getcwd())
 
 # (1) Load the MNIST dataset
-training_images = i2n.convert_from_file('data/train-images-idx3-ubyte/train-images.idx3-ubyte')
-training_labels = i2n.convert_from_file('data/train-labels-idx1-ubyte/train-labels.idx1-ubyte')
-test_images = i2n.convert_from_file('data/t10k-images-idx3-ubyte/t10k-images.idx3-ubyte')
-test_labels = i2n.convert_from_file('data/t10k-labels-idx1-ubyte/t10k-labels.idx1-ubyte')
+training_images = i2n.convert_from_file('CS429/ML-pipline-hyperparmeter-tuning/data/train-images-idx3-ubyte/train-images.idx3-ubyte')
+training_labels = i2n.convert_from_file('CS429/ML-pipline-hyperparmeter-tuning/data/train-labels-idx1-ubyte/train-labels.idx1-ubyte')
+test_images = i2n.convert_from_file('CS429/ML-pipline-hyperparmeter-tuning/data/t10k-images-idx3-ubyte/t10k-images.idx3-ubyte')
+test_labels = i2n.convert_from_file('CS429/ML-pipline-hyperparmeter-tuning/data/t10k-labels-idx1-ubyte/t10k-labels.idx1-ubyte')
 
 # (2) Flatten images 
 training_images = training_images.reshape(training_images.shape[0], -1)
@@ -63,12 +66,16 @@ for d in PCA_dimensions:
         y_pred = best_model.predict(X_test)
         accuracy = accuracy_score(y_test, y_pred)
 
+        # Get confusion matrix
+        cm = confusion_matrix(y_test, y_pred)
+
         print(f"Best params: {gs.best_params_}")
         print(f"Test accuracy: {accuracy:.4f}")
 
         results[(d, k)] = {
             'accuracy': accuracy,
-            'best_params': gs.best_params_
+            'best_params': gs.best_params_,
+            'confusion_matrix': cm
         }
 
 # (4) Save the results to a text file 
@@ -81,6 +88,7 @@ for (n_components, kernel), info in results.items():
         'Best C': info['best_params'].get('svc__C', None),
         'Best Gamma': info['best_params'].get('svc__gamma', None),
         'Best Degree': info['best_params'].get('svc__degree', None),
+        'Confusion Matrix': info['confusion_matrix']
     })
 
 # Create DataFrame
