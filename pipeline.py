@@ -9,11 +9,21 @@ from sklearn.pipeline import make_pipeline
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import accuracy_score
 
-# (1) Load the MNIST dataset
-training_images = i2n.convert_from_file('data/train-images-idx3-ubyte/train-images.idx3-ubyte')
-training_labels = i2n.convert_from_file('data/train-labels-idx1-ubyte/train-labels.idx1-ubyte')
-test_images = i2n.convert_from_file('data/t10k-images-idx3-ubyte/t10k-images.idx3-ubyte')
-test_labels = i2n.convert_from_file('data/t10k-labels-idx1-ubyte/t10k-labels.idx1-ubyte')
+# (1) Load dataset
+# If test_fashion false -> test MNIST else test fashion-MNIST
+fashion_MNIST = True
+if fashion_MNIST:
+    # Fashion-MNISTdata/fashsion-mnist/train-images-idx3-ubyte
+    training_images = i2n.convert_from_file('data/fashion-mnist/train-images-idx3-ubyte')
+    training_labels = i2n.convert_from_file('data/fashion-mnist/train-labels-idx1-ubyte')
+    test_images = i2n.convert_from_file('data/fashion-mnist/t10k-images-idx3-ubyte')
+    test_labels = i2n.convert_from_file('data/fashion-mnist/t10k-labels-idx1-ubyte')
+else:
+    # MNIST
+    training_images = i2n.convert_from_file('data/mnist/train-images.idx3-ubyte')
+    training_labels = i2n.convert_from_file('data/mnist/train-labels.idx1-ubyte')
+    test_images = i2n.convert_from_file('data/mnist/t10k-images.idx3-ubyte')
+    test_labels = i2n.convert_from_file('data/mnist/t10k-labels.idx1-ubyte')
 
 # (2) Flatten images 
 training_images = training_images.reshape(training_images.shape[0], -1)
@@ -30,8 +40,8 @@ y_train = training_labels[:subset_size]
 X_test = test_images[:subset_size]
 y_test = test_labels[:subset_size]
 
-# (3) Create ML Pipeline
 
+# (3) Create ML Pipeline
 # Define search space (num of paramters had to be reduced to avoid long computation time)
 param_range_C = [0.1, 1, 10, 100]
 param_range_G = [1e-4, 1e-3, 1e-2, 0.1]
@@ -87,4 +97,5 @@ for (n_components, kernel), info in results.items():
 df_results = pd.DataFrame(table_data)
 
 # Save DataFrame to CSV
-df_results.to_csv('svc_pca_results_table.csv', index=False)
+if fashion_MNIST: df_results.to_csv('svc_pca_results_table_fasion_mnist.csv', index=False)
+else: df_results.to_csv('svc_pca_results_table.csv', index=False)
