@@ -7,7 +7,10 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import make_pipeline
 from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, confusion_matrix
+import os
+print(os.getcwd())
+
 
 # (1) Load dataset
 # If test_fashion false -> test MNIST else test fashion-MNIST
@@ -73,12 +76,17 @@ for d in PCA_dimensions:
         y_pred = best_model.predict(X_test)
         accuracy = accuracy_score(y_test, y_pred)
 
+        # Get confusion matrix
+        cm = confusion_matrix(y_test, y_pred)
+
         print(f"Best params: {gs.best_params_}")
         print(f"Test accuracy: {accuracy:.4f}")
 
         results[(d, k)] = {
             'accuracy': accuracy,
-            'best_params': gs.best_params_
+            'best_params': gs.best_params_,
+            'confusion_matrix': cm
+
         }
 
 # (4) Save the results to a text file 
@@ -91,6 +99,8 @@ for (n_components, kernel), info in results.items():
         'Best C': info['best_params'].get('svc__C', None),
         'Best Gamma': info['best_params'].get('svc__gamma', None),
         'Best Degree': info['best_params'].get('svc__degree', None),
+        'Confusion Matrix': info['confusion_matrix']
+
     })
 
 # Create DataFrame
